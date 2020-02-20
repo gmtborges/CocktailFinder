@@ -4,28 +4,23 @@ export default StyleSheet.create({
   linearGradient: {
     flex: 1,
   },
+  safeArea: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-  },
-  titleContainer: {
-    flexDirection: 'row',
-    marginTop: 10,
-    marginBottom: 20,
-  },
-  titlePrimary: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#FFF',
-  },
-  titleSecondary: {
-    fontSize: 24,
-    color: '#FFF',
   },
   searchContainer: {
     flexDirection: 'row',
-    marginHorizontal: 20,
+    marginTop: 6,
+    marginRight: 20,
+  },
+  searchGoBack: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 6,
+    marginLeft: 4,
+    paddingHorizontal: 12,
   },
   searchInput: {
     flex: 1,
@@ -41,5 +36,9 @@ export default StyleSheet.create({
     borderRadius: 6,
     marginLeft: 4,
     paddingHorizontal: 12,
+  },
+  list: {
+    marginHorizontal: 40,
+    marginVertical: 30,
   },
 });
