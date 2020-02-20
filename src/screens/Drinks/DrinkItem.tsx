@@ -8,7 +8,7 @@ interface IProps {
 }
 
 const DrinkItem = (props: IProps) => {
-  const {strDrink: name, strDrinkThumb: thumb} = props.drink;
+  const {name, thumb} = props.drink;
   return (
     <View style={styles.container}>
       <Image source={{uri: thumb}} style={styles.thumb} />

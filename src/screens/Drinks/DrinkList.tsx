@@ -1,46 +1,48 @@
 import * as React from 'react';
-import {View, FlatList, Text, TextInput, ActivityIndicator} from 'react-native';
+import {
+  View,
+  FlatList,
+  TextInput,
+  ActivityIndicator,
+  Keyboard,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import FontistoIcon from 'react-native-vector-icons/Fontisto';
-
-import styles from '../../styles/DrinkList';
 import {RectButton} from 'react-native-gesture-handler';
 import {SafeAreaView} from 'react-native-safe-area-context';
+import {connect} from 'react-redux';
+
+import styles from '../../styles/DrinkList';
 import DrinkItem from './DrinkItem';
+import {fetchDrinks, changeInput} from '../../state/actions/drinkActions';
 
 interface IProps {
   navigation: {
     goBack(): void;
   };
-  route: {
-    params: {
-      searchInput: string;
-      loading: boolean;
-      drinks: [] | null;
-    };
-  };
-}
-interface IState {
   searchInput: string;
   loading: boolean;
   drinks: [] | null;
+  dispatch(action: any): any;
 }
-export default class DrinkList extends React.Component<IProps, IState> {
+
+class DrinkList extends React.Component<IProps> {
   constructor(props: IProps) {
     super(props);
-    this.state = {
-      searchInput: props.route.params.searchInput,
-      loading: props.route.params.loading,
-      drinks: props.route.params.drinks,
-    };
   }
+
   handleGoBack = () => {
     this.props.navigation.goBack();
   };
 
+  handleFetchDrinks = () => {
+    const {searchInput, dispatch} = this.props;
+    dispatch(fetchDrinks(`search.php?${searchInput}`));
+    Keyboard.dismiss();
+  };
+
   render() {
-    const {searchInput, loading} = this.state;
-    const {drinks} = this.props.route.params;
+    const {searchInput, loading, drinks, dispatch} = this.props;
     return (
       <LinearGradient
         colors={['#ae0eb7', '#d80091', '#ee0068', '#f40340', '#eb4812']}
@@ -64,11 +66,13 @@ export default class DrinkList extends React.Component<IProps, IState> {
                 placeholder="Search your favorite cocktail"
                 placeholderTextColor="#555"
                 value={searchInput}
-                onChangeText={text => this.setState({searchInput: text})}
+                onChangeText={text => dispatch(changeInput(text))}
                 returnKeyType="send"
-                onSubmitEditing={() => {}}
+                onSubmitEditing={this.handleFetchDrinks}
               />
-              <RectButton onPress={() => {}} style={styles.searchSubmit}>
+              <RectButton
+                onPress={this.handleFetchDrinks}
+                style={styles.searchSubmit}>
                 {loading ? (
                   <ActivityIndicator color="#D80091" />
                 ) : (
@@ -81,7 +85,7 @@ export default class DrinkList extends React.Component<IProps, IState> {
               showsVerticalScrollIndicator={false}
               style={styles.list}
               keyExtractor={(drink: any) => {
-                return drink.idDrink;
+                return drink.id;
               }}
               renderItem={({item}) => <DrinkItem drink={item} />}
             />
@@ -91,3 +95,10 @@ export default class DrinkList extends React.Component<IProps, IState> {
     );
   }
 }
+
+const mapStateToProps = (state: any) => ({
+  loading: state.loading,
+  searchInput: state.searchInput,
+  drinks: state.drinks,
+});
+export default connect(mapStateToProps)(DrinkList);

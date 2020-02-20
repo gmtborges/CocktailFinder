@@ -1,58 +1,38 @@
 import * as React from 'react';
-import {Text, View, TextInput, Keyboard, ActivityIndicator} from 'react-native';
+import {Text, View, TextInput, ActivityIndicator} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import FontistoIcon from 'react-native-vector-icons/Fontisto';
 import {RectButton} from 'react-native-gesture-handler';
+import {fetchDrinks, changeInput} from '../state/actions/drinkActions';
+import {connect} from 'react-redux';
 
 import styles from '../styles/Home';
-import api from '../services/api';
-import {AxiosResponse} from 'axios';
 
 interface IProps {
   navigation: {
     navigate(screen: string, params?: any): void;
   };
-}
-interface IState {
-  searchInput: string;
   loading: boolean;
+  searchInput: string;
+  dispatch(action: any): any;
 }
-export default class Home extends React.Component<IProps, IState> {
+
+class Home extends React.Component<IProps> {
   constructor(props: IProps) {
     super(props);
-    this.state = {
-      searchInput: '',
-      loading: false,
-    };
   }
 
-  handleSearchInput = async () => {
-    const {searchInput, loading} = this.state;
-    this.setState({loading: true});
+  handleFetchDrinks = async () => {
+    const {searchInput, dispatch} = this.props;
     if (searchInput === '') {
-      this.setState({loading: false});
       return;
     }
-    const response: AxiosResponse<any> = await api.get(
-      `search.php?s=${searchInput}`,
-    );
-    interface IResponseData {
-      drinks: [] | null;
-    }
-    const data: IResponseData = {
-      drinks: response.data.drinks,
-    };
-
-    this.setState({loading: false, searchInput: ''});
-    this.props.navigation.navigate('Drinks', {
-      searchInput,
-      drinks: data.drinks,
-      loading,
-    });
-    Keyboard.dismiss();
+    await dispatch(fetchDrinks(`search.php?${searchInput}`));
+    this.props.navigation.navigate('Drinks');
   };
+
   render() {
-    const {searchInput, loading} = this.state;
+    const {loading, searchInput, dispatch} = this.props;
     return (
       <LinearGradient
         colors={['#ae0eb7', '#d80091', '#ee0068', '#f40340', '#eb4812']}
@@ -71,12 +51,12 @@ export default class Home extends React.Component<IProps, IState> {
               placeholder="Search your favorite cocktail"
               placeholderTextColor="#555"
               value={searchInput}
-              onChangeText={text => this.setState({searchInput: text})}
+              onChangeText={text => dispatch(changeInput(text))}
               returnKeyType="send"
-              onSubmitEditing={this.handleSearchInput}
+              onSubmitEditing={this.handleFetchDrinks}
             />
             <RectButton
-              onPress={this.handleSearchInput}
+              onPress={this.handleFetchDrinks}
               style={styles.searchSubmit}>
               {loading ? (
                 <ActivityIndicator color="#D80091" />
@@ -90,3 +70,11 @@ export default class Home extends React.Component<IProps, IState> {
     );
   }
 }
+
+const mapStateToProps = (state: any) => {
+  return {
+    loading: state.loading,
+    searchInput: state.searchInput,
+  };
+};
+export default connect(mapStateToProps)(Home);

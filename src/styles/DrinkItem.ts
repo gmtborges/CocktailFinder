@@ -15,11 +15,12 @@ const styles = StyleSheet.create({
     height: 64,
     borderRadius: 32,
     marginRight: 16,
-    backgroundColor: '#EEE',
+    backgroundColor: '#DDD',
   },
   name: {
     fontSize: 20,
     textAlign: 'center',
+    flex: 0.9,
   },
 });
 
